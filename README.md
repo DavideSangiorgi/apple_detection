@@ -1,4 +1,4 @@
-# Object Detection project: Apples
+# Object Detection project: Apples :apple:
 
 
 ## Overview
@@ -16,8 +16,8 @@ The information is organized by image and class, providing a structure like the 
   "IMG_6081.JPG": {
     "path": "data/test/IMG_6081.JPG",
     "position": {
-      "apples": [[x1, y1], [x2, y2], ...],
-      "car": [...]
+      "apples": &#91;&#91;x1, y1&#93;, &#91;x2, y2&#93;, ...&#93;,
+      "car": &#91;...&#93;
     }
   },
   // ...
