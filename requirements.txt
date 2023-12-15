@@ -1,7 +1,4 @@
-tqdm
-
 torch
-torchvision
 
 ultralytics
 supervision
