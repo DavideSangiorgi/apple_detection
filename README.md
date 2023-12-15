@@ -16,8 +16,8 @@ The information is organized by image and class, providing a structure like the 
   "IMG_6081.JPG": {
     "path": "data/test/IMG_6081.JPG",
     "position": {
-      "apples": \[\[x1, y1\], \[x2, y2\], ...\],
-      "car": \[...\]
+      "apples": [[x1, y1], [x2, y2], ...],
+      "car": [...]
     }
   },
   // ...
