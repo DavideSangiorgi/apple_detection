@@ -43,6 +43,8 @@ Clone the repository and install the requirements.
 ```bash
 # Clone the repository
 git clone https://github.com/DavideSangiorgi/apple_detection.git
+# or
+git clone git@github.com:DavideSangiorgi/apple_detection.git
 
 # Change directory
 cd apple_detection
