@@ -11,7 +11,7 @@ The default configuration is tailored for apple detection, yet it's easily adapt
 The script outputs a JSON file containing the positions of detected objects. 
 The information is organized by image and class, providing a structure like the following:
 
-```json
+```
 {
   "IMG_6081.JPG": {
     "path": "data/test/IMG_6081.JPG",
