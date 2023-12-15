@@ -98,6 +98,8 @@ Check CUDA device availability with `torch.cuda.is_available()` and the number o
 
 - **`confidence_threshold`**: Float between 0 and 1, setting the confidence score threshold for filtering predictions.
 
+- **`iou_threshold`**: Float between 0 and 1, setting the IOU threshold for filtering predictions.
+
 - **`augment`**: Boolean determining whether to perform augmentation during prediction, potentially improving performance.
 
 - **`classes`**: List of classes to detect. If set to `null`, all YOLO classes will be detected.

@@ -1,7 +1,8 @@
 {
   "YOLO_model": "yolov8x.pt",
   "device": "cpu",
-  "confidence_threshold": 0.3,
+  "confidence_threshold": 0.13,
+  "iou_threshold": 0.3,
   "augment": true,
   "classes": ["apple"],
   "box_line_width": 15,

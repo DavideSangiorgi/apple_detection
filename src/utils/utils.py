@@ -18,14 +18,14 @@ DEVICES = ["cpu"] + [f"cuda:{n}" for n in range(device_count())]
 
 
 def load_config(local_storage: LocalStorageManager, config_path: str) -> dict:
-    '''
+    """
     Check that configuration parameters are in compliance with the corresponding restictions
     and converting, when necessary, raw values to more convenient class instances
 
     Attributes:
         local_storage: LocalStorageManager instance of the project to access project directories
         config_path: str path of the JSON configuration file
-    '''
+    """
     ### Load JSON
     raw_config = local_storage.load_json(config_path)
 
@@ -34,24 +34,37 @@ def load_config(local_storage: LocalStorageManager, config_path: str) -> dict:
         raw_config["YOLO_model"] in YOLO_MODELS
     ), f'{raw_config["YOLO_model"]} not in {YOLO_MODELS}'
 
+    raw_config["YOLO_model"] = local_storage.dirs.models.joinpath(
+        raw_config["YOLO_model"]
+    )
+
     ### Check device
     assert raw_config["device"] in DEVICES, f'{raw_config["device"]} not in {DEVICES}'
 
     ### Check confidence_threshold
-    assert isinstance(
-        raw_config["confidence_threshold"], float
+    assert isinstance(raw_config["confidence_threshold"], float) or isinstance(
+        raw_config["confidence_threshold"], int
     ), f'confidence_threshold is of type {type(raw_config["confidence_threshold"])}'
 
     assert (
         0 <= raw_config["confidence_threshold"] <= 1
     ), f'confidence_threshold = {raw_config["confidence_threshold"]}'
 
+    ### Check iou_threshold
+    assert isinstance(raw_config["iou_threshold"], float) or isinstance(
+        raw_config["iou_threshold"], int
+    ), f'iou_threshold is of type {type(raw_config["iou_threshold"])}'
+
+    assert (
+        0 <= raw_config["iou_threshold"] <= 1
+    ), f'iou_threshold = {raw_config["iou_threshold"]}'
+
     ### Check augmentation
     assert isinstance(
         raw_config["augment"], bool
     ), f'augment is of type {type(raw_config["augment"])}'
 
-    ### Check classes 
+    ### Check classes
     ### convert into list if necessary
     if isinstance(raw_config["classes"], str):
         raw_config["classes"] = [raw_config["classes"]]
@@ -89,7 +102,7 @@ def get_object_positions(
     predictions,
     idx_cls_map: dict,
 ) -> dict:
-    '''
+    """
     Extracts from YOLO bounding boxes the centre of detected objects
     and groups them by input image and detection class.
 
@@ -98,7 +111,7 @@ def get_object_positions(
         local_storage: LocalStorageManager instance of the project to access project directories
         idx_cls_map: dictionary mapping YOLO class indexes to corresponding class names
         results_path: output path where to save the JSON file containing object positions
-    '''
+    """
     position_map = {}
 
     ### Iterate over the input images
@@ -109,7 +122,7 @@ def get_object_positions(
 
         ### Use image name as first grouping key of the dictionary
         position_map[img_name] = {}
-        
+
         position_map[img_name]["path"] = str(img_path)
 
         position_map[img_name]["position"] = {}
@@ -128,23 +141,23 @@ def get_object_positions(
         # position_map_path = results_path.joinpath("positions.json")
 
         # local_storage.store_json(path_raw=str(position_map_path), data=position_map)
-            
-        return position_map
+
+    return position_map
 
 
 def draw_positions(position_map: dict, results_path: Path, center_rad: int) -> None:
-    '''
+    """
     Draws the centre of bounding boxes into corresponding images
-    '''
+    """
     ### Iterate over all images
     for img_dict in position_map.values():
-        ### Get output image 
-        input_img_path = Path(img_dict['path'])
+        ### Get output image
+        input_img_path = Path(img_dict["path"])
         output_img_path = results_path.joinpath(input_img_path.name)
         img = Image.open(output_img_path)
 
         ### Iterate over all detected class positions
-        for cls_positions in img_dict['position'].values():
+        for cls_positions in img_dict["position"].values():
             ### Iterate over all detected objects of the class
             for center_xy in cls_positions:
                 ### Get centre bounding bos for drawing
@@ -156,8 +169,7 @@ def draw_positions(position_map: dict, results_path: Path, center_rad: int) -> N
                 ]
 
                 ### Draw centre
-                ImageDraw.Draw(img).ellipse(xy=xy, fill='blue', outline='blue')
+                ImageDraw.Draw(img).ellipse(xy=xy, fill="blue", outline="blue")
 
         ### Save updated image
         img.save(output_img_path)
-

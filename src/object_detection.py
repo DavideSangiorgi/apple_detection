@@ -45,6 +45,7 @@ def main(config_path: Path):
     predictions = model.predict(
         source=img_paths,
         conf=config["confidence_threshold"],
+        iou=config["iou_threshold"],
         augment=config["augment"],
         classes=class_idxs,
         save=True,
@@ -55,8 +56,7 @@ def main(config_path: Path):
 
     ### Save objects position
     position_map = get_object_positions(
-        predictions=predictions,
-        idx_cls_map=model.names
+        predictions=predictions, idx_cls_map=model.names
     )
 
     ### Draw positions
