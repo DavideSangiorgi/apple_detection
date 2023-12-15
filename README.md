@@ -35,10 +35,6 @@ Each box is labeled with the corresponding class and confidence score.
 - [Configuration](#configuration)
   - [YOLO Model Initialization Parameters](#YOLO-Model-Initialization-Parameters)
   - [Model Prediction Parameters](#Model-Prediction-Parameters)
-- [Training](#training)
-- [Testing](#testing)
-- [Contributing](#contributing)
-- [License](#license)
 
 
 ## Installation
