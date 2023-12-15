@@ -1,4 +1,3 @@
-from enum import Enum
 from pathlib import Path
 
 from ultralytics import YOLO
@@ -10,19 +9,6 @@ from utils.storage import LocalStorageManager
 
 
 LocalStorage = LocalStorageManager()
-
-
-###
-
-"""
-TODO: 
-    - add some image preprocesing
-    - comment everything
-    - organize imports
-    - localstorage deve essere 1!
-    - make all comments start with upper case
-    - replace config params that go directly to evaluate with the dict call directly
-"""
 
 
 ###

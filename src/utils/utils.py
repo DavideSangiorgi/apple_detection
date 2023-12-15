@@ -19,17 +19,26 @@ DEVICES = ["cpu"] + [f"cuda:{n}" for n in range(device_count())]
 
 
 def load_config(local_storage: LocalStorageManager, config_path: str) -> dict:
+    '''
+    Check that configuration parameters are in compliance with the corresponding restictions
+    and converting, when necessary, raw values to more convenient class instances
+
+    Attributes:
+        local_storage: LocalStorageManager instance of the project to access project directories
+        config_path: str path of the JSON configuration file
+    '''
+    ### Load JSON
     raw_config = local_storage.load_json(config_path)
 
-    ### check selected version
+    ### Check model
     assert (
         raw_config["YOLO_model"] in YOLO_MODELS
     ), f'{raw_config["YOLO_model"]} not in {YOLO_MODELS}'
 
-    ### check device
+    ### Check device
     assert raw_config["device"] in DEVICES, f'{raw_config["device"]} not in {DEVICES}'
 
-    ### check confidence threshold
+    ### Check confidence_threshold
     assert isinstance(
         raw_config["confidence_threshold"], float
     ), f'confidence_threshold is of type {type(raw_config["confidence_threshold"])}'
@@ -38,12 +47,13 @@ def load_config(local_storage: LocalStorageManager, config_path: str) -> dict:
         0 <= raw_config["confidence_threshold"] <= 1
     ), f'confidence_threshold = {raw_config["confidence_threshold"]}'
 
-    ### check augmentation
+    ### Check augmentation
     assert isinstance(
         raw_config["augment"], bool
     ), f'augment is of type {type(raw_config["augment"])}'
 
-    ### check classes
+    ### Check classes 
+    ### convert into list if necessary
     if isinstance(raw_config["classes"], str):
         raw_config["classes"] = [raw_config["classes"]]
 
@@ -55,17 +65,21 @@ def load_config(local_storage: LocalStorageManager, config_path: str) -> dict:
         [isinstance(c, str) for c in raw_config["classes"]]
     ), f'{raw_config["classes"]}'
 
+    ### uniform string case
     raw_config["classes"] = [c.title() for c in raw_config["classes"]]
 
-    ### check box_line_width
+    ### Check box_line_width
     assert raw_config["box_line_width"] is None or isinstance(
         raw_config["box_line_width"], int
     ), f'box_line_width is of type {type(raw_config["box_line_width"])}'
 
-    ### check results_path
+    ### Check results_path
     assert isinstance(raw_config["results_path"], str)
+    ### convert into path
     raw_config["results_path"] = Path(raw_config["results_path"])
+    ### make only parent directory, result directory will be created by YOLO
     raw_config["results_path"].parent.mkdir(exist_ok=True)
+    ### if directory already existing, remove it
     if raw_config["results_path"].exists():
         shutil.rmtree(str(raw_config["results_path"]))
 
@@ -78,16 +92,34 @@ def save_object_positions(
     idx_cls_map: dict,
     results_path: Path,
 ) -> None:
+    '''
+    Extracts from YOLO bounding boxes the centre of detected objects
+    and groups them by input image and detection class.
+
+    Attributes:
+        predictions: YOLO predict() output
+        local_storage: LocalStorageManager instance of the project to access project directories
+        idx_cls_map: dictionary mapping YOLO class indexes to corresponding class names
+        results_path: output path where to save the JSON file containing object positions
+    '''
     position_map = {}
+
+    ### Iterate over the input images
     for pred in predictions:
+        ### Get input image path
         img_path = Path(pred.path)
         img_name = img_path.stem
+
+        ### Use image name as first grouping key of the dictionary
         position_map[img_name] = {}
+        
         position_map[img_name]["path"] = str(img_path)
 
         position_map[img_name]["position"] = {}
 
+        ### Iterate over the objects detected in a single image
         for cls, xywh in zip(pred.boxes.cls, pred.boxes.xywh):
+            ### Get position and add to the corresponding class position list
             position = [
                 int(xywh[0] + (xywh[2] / 2)),
                 int(xywh[1] + (xywh[3] / 2)),
@@ -98,6 +130,7 @@ def save_object_positions(
                 "position"
             ].get(cls_name, []) + [position]
 
+        ### Save positions into JSON file
         position_map_path = results_path.joinpath("positions.json")
 
         local_storage.store_json(path_raw=str(position_map_path), data=position_map)

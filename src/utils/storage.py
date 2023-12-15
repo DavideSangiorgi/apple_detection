@@ -11,12 +11,15 @@ T_JsonData = Union[dict, list]
 
 
 class LocalStorageDirectoryManager:
+    '''
+    Initializes and validates directories used for the project.
+    Provides a single point of access for key directories, 
+    reducing ambiguity and enhancing codebase clarity.
+    '''
     def __init__(self) -> None:
         self.root: Path = None
         self.data: Path = None
         self.data_test: Path = None
-        self.models: Path = None
-        self.results: Path = None
 
         self.__initialize()
         self.__mkdirs()
@@ -28,24 +31,27 @@ class LocalStorageDirectoryManager:
         self.root = Path(__file__).parent.parent.parent
         self.data = self.root.joinpath("data")
         self.data_test = self.data.joinpath("test")
-        self.models = self.data.joinpath("models")
 
     def __mkdirs(self) -> None:
         self.data.mkdir(exist_ok=True)
         self.data_test.mkdir(exist_ok=True)
-        self.models.mkdir(exist_ok=True)
 
     def __validate(self) -> None:
         assert self.root.is_dir(), f"{self.root} is not a directory"
         assert self.data.is_dir(), f"{self.data} is not a directory"
         assert self.data_test.is_dir(), f"{self.data_test} is not a directory"
-        assert self.models.is_dir(), f"{self.models} is not a directory"
 
 
 ###
 
 
 class LocalStorageManager:
+    '''
+    Initializes and validates directories used for the project.
+    Provides a single point of access for key directories, 
+    reducing ambiguity and enhancing codebase clarity.
+    Integrates handling methods to LocalStorageDirectoryManager.
+    '''
     def __init__(self) -> None:
         self.dirs = LocalStorageDirectoryManager()
 
