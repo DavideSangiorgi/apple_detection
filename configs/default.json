@@ -1,0 +1,9 @@
+{
+  "YOLO_model": "yolov8x.pt",
+  "device": "cpu",
+  "confidence_threshold": 0.3,
+  "augment": true,
+  "classes": ["apple"],
+  "box_line_width": null,
+  "results_path": "results/detection"
+}
