@@ -46,10 +46,10 @@ Clone the repository and install the requirements.
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/your-project.git
+git clone https://github.com/DavideSangiorgi/apple_detection.git
 
 # Change directory
-cd your-project
+cd apple_detection
 
 # Install dependencies
 pip install -r requirements.txt
