@@ -1,11 +1,10 @@
-from enum import Enum
+import shutil
+from pathlib import Path
 
-from .storage import LocalStorageManager
+from PIL import Image, ImageDraw
 from torch.cuda import device_count
 
-from pathlib import Path
-import shutil
-
+from .storage import LocalStorageManager
 
 YOLO_MODELS = [
     "yolov8n.pt",
@@ -86,12 +85,10 @@ def load_config(local_storage: LocalStorageManager, config_path: str) -> dict:
     return raw_config
 
 
-def save_object_positions(
+def get_object_positions(
     predictions,
-    local_storage: LocalStorageManager,
     idx_cls_map: dict,
-    results_path: Path,
-) -> None:
+) -> dict:
     '''
     Extracts from YOLO bounding boxes the centre of detected objects
     and groups them by input image and detection class.
@@ -120,17 +117,47 @@ def save_object_positions(
         ### Iterate over the objects detected in a single image
         for cls, xywh in zip(pred.boxes.cls, pred.boxes.xywh):
             ### Get position and add to the corresponding class position list
-            position = [
-                int(xywh[0] + (xywh[2] / 2)),
-                int(xywh[1] + (xywh[3] / 2)),
-            ]
+            position = [int(xywh[0]), int(xywh[1])]
 
             cls_name = idx_cls_map[int(cls)]
             position_map[img_name]["position"][cls_name] = position_map[img_name][
                 "position"
             ].get(cls_name, []) + [position]
 
-        ### Save positions into JSON file
-        position_map_path = results_path.joinpath("positions.json")
+        # ### Save positions into JSON file
+        # position_map_path = results_path.joinpath("positions.json")
 
-        local_storage.store_json(path_raw=str(position_map_path), data=position_map)
+        # local_storage.store_json(path_raw=str(position_map_path), data=position_map)
+            
+        return position_map
+
+
+def draw_positions(position_map: dict, results_path: Path, center_rad: int) -> None:
+    '''
+    Draws the centre of bounding boxes into corresponding images
+    '''
+    ### Iterate over all images
+    for img_dict in position_map.values():
+        ### Get output image 
+        input_img_path = Path(img_dict['path'])
+        output_img_path = results_path.joinpath(input_img_path.name)
+        img = Image.open(output_img_path)
+
+        ### Iterate over all detected class positions
+        for cls_positions in img_dict['position'].values():
+            ### Iterate over all detected objects of the class
+            for center_xy in cls_positions:
+                ### Get centre bounding bos for drawing
+                xy = [
+                    center_xy[0] - center_rad,
+                    center_xy[1] - center_rad,
+                    center_xy[0] + center_rad,
+                    center_xy[1] + center_rad,
+                ]
+
+                ### Draw centre
+                ImageDraw.Draw(img).ellipse(xy=xy, fill='blue', outline='blue')
+
+        ### Save updated image
+        img.save(output_img_path)
+

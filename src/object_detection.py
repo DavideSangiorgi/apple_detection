@@ -2,7 +2,10 @@ from pathlib import Path
 
 from ultralytics import YOLO
 
-from utils import load_config, parse_args, save_object_positions
+from utils import draw_positions
+from utils import get_object_positions
+from utils import load_config
+from utils import parse_args
 from utils.storage import LocalStorageManager
 
 ###
@@ -22,6 +25,7 @@ def main(config_path: Path):
     device: str = config["device"]
     class_names: list = config["classes"]
     results_path: Path = config["results_path"]
+    line_width: int = config["box_line_width"]
 
     ### Load pre-trained model
     model = YOLO(yolo_model)
@@ -44,18 +48,27 @@ def main(config_path: Path):
         augment=config["augment"],
         classes=class_idxs,
         save=True,
-        line_width=config["box_line_width"],
+        line_width=line_width,
         project=str(results_path.parent),
         name=str(results_path.name),
     )
 
     ### Save objects position
-    save_object_positions(
+    position_map = get_object_positions(
         predictions=predictions,
-        local_storage=LocalStorage,
-        idx_cls_map=model.names,
-        results_path=results_path,
+        idx_cls_map=model.names
     )
+
+    ### Draw positions
+    draw_positions(
+        position_map=position_map,
+        results_path=results_path,
+        center_rad=line_width,
+    )
+
+    ### Save positions into JSON file
+    position_map_path = results_path.joinpath("positions.json")
+    LocalStorage.store_json(path_raw=str(position_map_path), data=position_map)
 
 
 ###

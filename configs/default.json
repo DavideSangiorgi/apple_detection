@@ -4,6 +4,6 @@
   "confidence_threshold": 0.3,
   "augment": true,
   "classes": ["apple"],
-  "box_line_width": null,
+  "box_line_width": 15,
   "results_path": "results/detection"
 }
