@@ -3,9 +3,9 @@
 
 ## Overview
 
-This script serves as an object detector based on the latest version of YOLO, specifically YOLOv8. 
-You can find the YOLO repository [here](https://github.com/ultralytics/ultralytics) 
-and the official YOLO documentation [here](https://docs.ultralytics.com/).
+This script serves as an object detector based on the latest version of YOLO, specifically YOLOv5. 
+You can find the YOLO repository [here](https://github.com/ultralytics/yolov5) 
+and the official YOLO documentation [here](https://docs.ultralytics.com/yolov5/).
 
 The default configuration is tailored for apple detection, yet it's easily adaptable to any subset of YOLO detection classes. 
 The script outputs a JSON file containing the positions of detected objects. 
@@ -87,12 +87,12 @@ This section outlines the configurable parameters in the `configs` folder. Adjus
 ### YOLO Model Initialization Parameters
 
 - **`YOLO_model`**: Specifies the YOLO model to use for detection. 
-Options, from smallest/less performant to heavier/most performant: "yolov8n.pt", "yolov8s.pt", "yolov8m.pt", "yolov8l.pt", "yolov8x.pt". 
-Refer to the [YOLO documentation](https://docs.ultralytics.com/) for details.
+Options, from smallest/less performant to heavier/most performant: "yolov5n.pt", "yolov5s.pt", "yolov5m.pt", "yolov5l.pt", "yolov5x.pt", "yolov5n6.pt", "yolov5s6.pt", "yolov5m6.pt", "yolov5l6.pt", "yolov5x6.pt". 
+Refer to the [YOLO documentation](https://docs.ultralytics.com/yolov5/) for details.
 
 - **`device`**: Sets the device to run the model. 
 Options: "cpu" or "cuda:n" (replace n with the index of the available CUDA device). 
-Check CUDA device availability with `torch.cuda.is_available()` and the number of available devices with `torch.cuda.device_count()`.
+Check CUDA device availability with `python3 -c "import torch; print(torch.cuda.is_available())"` and the number of available devices with `python3 -c "import torch; print(torch.cuda.device_count())"`.
 
 ### Model Prediction Parameters
 
